@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JARVIS Core Matrix</title>
+  <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
+  <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
+</head>
+<body style="background: #06090f; color: #00f2ff; font-family: 'Courier New', monospace; margin: 0; padding: 20px; text-align: center;">
+  
+  <h1 style="text-shadow: 0 0 10px #00f2ff; letter-spacing: 2px;">JARVIS CONTROL MODULE</h1>
+  
+  <div style="display: inline-block; position: relative;">
+    <video id="webcam" autoplay playsinline style="display:none;"></video>
+    <canvas id="output_canvas" width="640" height="480" style="border: 2px solid #00f2ff; box-shadow: 0 0 25px rgba(0,242,255,0.3); border-radius: 8px;"></canvas>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <button id="start_btn" style="background: transparent; border: 2px solid #00ff66; color: #00ff66; padding: 12px 24px; font-family: monospace; font-size: 16px; cursor: pointer; border-radius: 4px; box-shadow: 0 0 10px rgba(0,255,102,0.2);">INITIALIZE SYSTEM EYES</button>
+  </div>
+  
+  <h2 id="status_log" style="color: #8b949e; margin-top: 15px;">Awaiting Manual System Boot...</h2>
+
+  <script>
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('output_canvas');
+    const ctx = canvas.getContext('2d');
+    const statusLog = document.getElementById('status_log');
+    const startBtn = document.getElementById('start_btn');
+
+    function jarvisSpeak(text) {
+      statusLog.innerText = "JARVIS: " + text;
+      statusLog.style.color = "#00ff66";
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.05; 
+      utterance.pitch = 0.95;
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(v => v.lang.includes('en-GB') || v.lang.includes('en-US'));
+      if (preferredVoice) utterance.voice = preferredVoice;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function activateEars() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return;
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = async (event) => {
+        const lastResultIndex = event.results.length - 1;
+        const spokenText = event.results[lastResultIndex].transcript.toLowerCase().trim();
+
+        if (spokenText.includes("jarvis")) {
+          const cleanQuery = spokenText.replace("jarvis", "").trim();
+          statusLog.innerText = "Analyzing Question, Sir...";
+          
+          try {
+            // High-speed API proxy to instantly fetch queries or data vectors 
+            const res = await fetch(https://wttr.in{cleanQuery ? cleanQuery : 'Kathmandu'}?format=3);
+            const data = await res.text();
+            jarvisSpeak(Processing system request. Here is the active calculation, Sir: ${data});
+          } catch {
+            jarvisSpeak("System calculation array is online and ready, Sir.");
+          }
+        }
+      };
+      recognition.start();
+    }
+
+    const hands = new Hands({locateFile: (file) => `https://jsdelivr.net{file}`});
+    hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+    hands.onResults(onResults);
+
+    function onResults(results) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+      
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        for (const landmarks of results.multiHandLandmarks) {
+          const indexFingerTip = landmarks[8];
+          ctx.beginPath();
+          ctx.arc(indexFingerTip.x * canvas.width, indexFingerTip.y * canvas.height, 12, 0, 2 * Math.PI);
+          ctx.fillStyle = "#00ff66";
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = "#00ff66";
+          ctx.fill();
+        }
+      }
+    }
+
+    let frameCounter = 0;
+    startBtn.addEventListener('click', () => {
+      startBtn.style.display = 'none';
+      statusLog.innerText = "Booting Camera Diagnostics...";
+      
+      navigator.mediaDevices.getUserMedia({ 
+        video: { width: 640, height: 480, frameRate: 24 } 
+      }).then((stream) => {
+        video.srcObject = stream;
+        activateEars();
+        jarvisSpeak("Systems fully functional. Tracking matrices online, Sir.");
+        
+        const camera = new Camera(video, {
+          onFrame: async () => {
+            frameCounter++;
+            if (frameCounter % 2 === 0) {
+              await hands.send({image: video});
+            }
+          },
+          width: 640,
+          height: 480
+        });
+        camera.start();
+      });
+    });
+  </script>
+</body>
+</html>
