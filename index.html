@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>JARVIS Core Matrix</title>
+  <!-- Secure fixed cloud framework connections -->
   <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
   <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
 </head>
@@ -11,14 +12,14 @@
   
   <div style="display: inline-block; position: relative;">
     <video id="webcam" autoplay playsinline style="display:none;"></video>
-    <canvas id="output_canvas" width="640" height="480" style="border: 2px solid #00f2ff; box-shadow: 0 0 25px rgba(0,242,255,0.3); border-radius: 8px;"></canvas>
+    <canvas id="output_canvas" width="640" height="480" style="border: 2px solid #00f2ff; box-shadow: 0 0 25px rgba(0,242,255,0.3); border-radius: 8px; background: #000;"></canvas>
   </div>
 
   <div style="margin-top: 20px;">
-    <button id="start_btn" style="background: transparent; border: 2px solid #00ff66; color: #00ff66; padding: 12px 24px; font-family: monospace; font-size: 16px; cursor: pointer; border-radius: 4px; box-shadow: 0 0 10px rgba(0,255,102,0.2);">INITIALIZE SYSTEM EYES</button>
+    <button id="start_btn" style="background: #000; border: 2px solid #00ff66; color: #00ff66; padding: 12px 24px; font-family: monospace; font-size: 16px; cursor: pointer; border-radius: 4px; box-shadow: 0 0 10px rgba(0,255,102,0.2);">INITIALIZE SYSTEM EYES</button>
   </div>
   
-  <h2 id="status_log" style="color: #8b949e; margin-top: 15px;">Awaiting Manual System Boot...</h2>
+  <h2 id="status_log" style="color: #00f2ff; margin-top: 15px; font-weight: bold; background: rgba(0,242,255,0.1); display: inline-block; padding: 8px 16px; border-radius: 4px;">Awaiting Manual System Boot...</h2>
 
   <script>
     const video = document.getElementById('webcam');
@@ -29,7 +30,6 @@
 
     function jarvisSpeak(text) {
       statusLog.innerText = "JARVIS: " + text;
-      statusLog.style.color = "#00ff66";
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 1.05; 
@@ -55,15 +55,15 @@
 
         if (spokenText.includes("jarvis")) {
           const cleanQuery = spokenText.replace("jarvis", "").trim();
+          statusLog.style.color = "#ffff00";
           statusLog.innerText = "Analyzing Question, Sir...";
           
           try {
-            // High-speed API proxy to instantly fetch queries or data vectors 
             const res = await fetch(https://wttr.in{cleanQuery ? cleanQuery : 'Kathmandu'}?format=3);
             const data = await res.text();
-            jarvisSpeak(Processing system request. Here is the active calculation, Sir: ${data});
+            jarvisSpeak(Data vector retrieved. The active calculation, Sir: ${data});
           } catch {
-            jarvisSpeak("System calculation array is online and ready, Sir.");
+            jarvisSpeak("Calculations complete. System mainframes are stable, Sir.");
           }
         }
       };
@@ -71,7 +71,7 @@
     }
 
     const hands = new Hands({locateFile: (file) => `https://jsdelivr.net{file}`});
-    hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+    hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
     hands.onResults(onResults);
 
     function onResults(results) {
@@ -79,12 +79,14 @@
       ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
       
       if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        statusLog.innerText = "JARVIS: TARGET TRACKED";
+        statusLog.style.color = "#00ff66";
         for (const landmarks of results.multiHandLandmarks) {
-          const indexFingerTip = landmarks[8];
+          const indexFingerTip = landmarks; 
           ctx.beginPath();
-          ctx.arc(indexFingerTip.x * canvas.width, indexFingerTip.y * canvas.height, 12, 0, 2 * Math.PI);
+          ctx.arc(indexFingerTip.x * canvas.width, indexFingerTip.y * canvas.height, 15, 0, 2 * Math.PI);
           ctx.fillStyle = "#00ff66";
-          ctx.shadowBlur = 15;
+          ctx.shadowBlur = 20;
           ctx.shadowColor = "#00ff66";
           ctx.fill();
         }
@@ -95,11 +97,13 @@
     startBtn.addEventListener('click', () => {
       startBtn.style.display = 'none';
       statusLog.innerText = "Booting Camera Diagnostics...";
+      statusLog.style.color = "#ffff00";
       
       navigator.mediaDevices.getUserMedia({ 
         video: { width: 640, height: 480, frameRate: 24 } 
       }).then((stream) => {
         video.srcObject = stream;
+        video.play();
         activateEars();
         jarvisSpeak("Systems fully functional. Tracking matrices online, Sir.");
         
@@ -114,8 +118,14 @@
           height: 480
         });
         camera.start();
+      }).catch((err) => {
+        statusLog.innerText = "Hardware Connection Error. Check Permissions.";
+        statusLog.style.color = "#ff3333";
+        console.error(err);
       });
     });
   </script>
 </body>
 </html>
+Compose
+Dhakal Liladhar लाई केही कुरा लेख्नुहोस्
